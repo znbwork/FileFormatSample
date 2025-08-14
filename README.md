@@ -9,5 +9,6 @@ FileFormatSample
 
 # xlsm
 - [DuplicateRowCheck.xlsm](excel/xlsm/DuplicateRowCheck.xlsm)
+- [vba.xlsm](excel/xlsm/vba.xlsm)
 
 The shortcut key to open the VBA editor is: `Alt + F11`
