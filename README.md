@@ -11,4 +11,6 @@ FileFormatSample
 - [DuplicateRowCheck.xlsm](excel/xlsm/DuplicateRowCheck.xlsm)
 - [vba.xlsm](excel/xlsm/vba.xlsm)
 
-The shortcut key to open the VBA editor is: `Alt + F11`
+# Shortcut key
+- VBA editor: `Alt + F11`
+- Named Ranges: `Ctrl + F3`
