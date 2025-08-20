@@ -88,3 +88,91 @@ End Sub
 
 ---
 
+## 📌 Python 实现步骤
+
+### 1. 安装依赖
+
+```bash
+pip install pandas openpyxl
+```
+
+### 2. 示例Python脚本
+
+假设：
+
+* `items.xlsx` → `Sheet1` 里存放项目一览（`A列`：item1, item2, ...）
+* `design.xlsx` → `Sheet2` 里存放英文设计书（`A列`：描述文本，比如 `tableA.item1 must be checked`）
+
+代码如下：
+
+```python
+import pandas as pd
+import re
+
+# 文件路径
+items_file = "items.xlsx"
+design_file = "design.xlsx"
+output_file = "result.xlsx"
+
+# 读取项目一览
+items_df = pd.read_excel(items_file, sheet_name="Sheet1", header=None)
+items = items_df[0].dropna().astype(str).tolist()  # 转成list
+pattern = re.compile(r"\b\w+\.(" + "|".join(map(re.escape, items)) + r")\b")
+
+# 读取设计书
+design_df = pd.read_excel(design_file, sheet_name="Sheet2", header=None)
+design_df = design_df.fillna("")  # 避免 NaN
+
+# 筛选匹配的行
+matched_rows = []
+for idx, row in design_df.iterrows():
+    text = str(row[0])
+    if pattern.search(text):
+        matched_rows.append([text])
+
+# 保存结果
+result_df = pd.DataFrame(matched_rows, columns=["Matched Rows"])
+result_df.to_excel(output_file, index=False)
+
+print(f"✅ 处理完成，结果已输出到 {output_file}")
+```
+
+---
+
+### 3. 脚本说明
+
+* `items.xlsx`
+
+  ```
+  item1
+  item2
+  ```
+* `design.xlsx`
+
+  ```
+  tableA.item1 must not be empty
+  tableB.item2 should be unique
+  tableC.item3 check length
+  ```
+* 运行后生成的 `result.xlsx` 内容：
+
+  ```
+  Matched Rows
+  tableA.item1 must not be empty
+  tableB.item2 should be unique
+  ```
+
+`tableC.item3` 被自动过滤掉，因为 `item3` 不在项目一览中。
+
+---
+
+### 4. 扩展功能
+
+你还可以很容易加上：
+
+* 输出 **匹配到的是哪个 item**（多列结果）。
+* 扫描 Excel 的 **多列** 或 **多行**。
+* 一次处理多个文档。
+
+---
+
