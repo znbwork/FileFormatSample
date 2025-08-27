@@ -48,6 +48,6 @@
 3.  **运行宏**：
     * 回到 Excel 主界面。
     * 按 `Alt + F8`，打开宏对话框。
-    * 选择 `CategorizeByKeyword_CustomRange`，然后点击 **“执行”**。
+    * 选择 `CategorizeByKeyword`，然后点击 **“执行”**。
 
 脚本将自动执行所有任务，并为您创建新的、分类好的工作表。
