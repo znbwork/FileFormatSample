@@ -1,3 +1,6 @@
+''''''''''''''''''''''''''''''''''''''''''''''''''
+' CategorizeByKeyword
+''''''''''''''''''''''''''''''''''''''''''''''''''
 Sub CategorizeByKeyword()
      ' Declares all necessary variables
      Dim wsInput As Worksheet
@@ -10,7 +13,10 @@ Sub CategorizeByKeyword()
      Dim targetSheet As Worksheet
      Dim targetRow As Long
 
-     ' Define the row range for keywords in column D
+     ' Define the column for keywords
+     Dim keywordColumn As Long
+
+     ' Define the row range for keywords
      Dim startRowKeywords As Long
      Dim endRowKeywords As Long
 
@@ -19,12 +25,15 @@ Sub CategorizeByKeyword()
      Dim endColData As Long
 
      ' --- SET YOUR RANGES HERE ---
+     ' This is where you specify the column containing keywords
+     keywordColumn = 4 ' Column D
+
      ' This is where you specify the range of rows that contain your keywords.
      startRowKeywords = 7
      endRowKeywords = 10
 
      ' This is where you specify the columns you want to extract.
-     startColData = 5  ' Column E
+     startColData = 1  ' Column E
      endColData = 8    ' Column H
      ' --- END OF RANGE SETTINGS ---
 
@@ -40,7 +49,7 @@ Sub CategorizeByKeyword()
          ' Check if the current row falls within the specified keyword range
          If i >= startRowKeywords And i <= endRowKeywords Then
              ' Get the value from the cell in column D
-             cellValue = Trim(wsInput.Cells(i, 4).Value)
+             cellValue = Trim(wsInput.Cells(i, keywordColumn).Value)
 
              ' Check if the cell in column D is not empty
              If cellValue <> "" Then
