@@ -3,7 +3,6 @@
 ''''''''''''''''''''''''''''''''''''''''''''''''''
 Sub CopyDataBasedOnKeyword()
 
-    ' Declare variables
     Dim wsInput As Worksheet
     Dim wsCopySource As Worksheet
     Dim lastRowInput As Long
@@ -15,68 +14,66 @@ Sub CopyDataBasedOnKeyword()
     Dim pasteRow As Long
     Dim keywordParts As Variant
     Dim keywordPart As Variant
-    Dim pasteOffset As Long
+    Dim insertCount As Long
 
     ' Set the source and destination worksheets
     Set wsInput = ThisWorkbook.Sheets("Input")
     Set wsCopySource = ThisWorkbook.Sheets("CopySource")
 
-    ' --- NEW: Clear all yellow-highlighted rows first ---
-    ' Find the last row to check for yellow cells
+    ' Clear all yellow-highlighted rows to ensure a clean start
     lastRowInput = wsInput.Cells(wsInput.Rows.Count, "A").End(xlUp).Row
-
-    ' Loop from the bottom up to delete any yellow-highlighted rows
     For i = lastRowInput To 2 Step -1
         If wsInput.Cells(i, "A").Interior.Color = RGB(255, 255, 0) Then
             wsInput.Rows(i).Delete
         End If
     Next i
 
-    ' --- End of the cleanup section ---
-
-    ' Recalculate the last row after deleting the old data
+    ' Recalculate the last row after the cleanup
     lastRowInput = wsInput.Cells(wsInput.Rows.Count, "C").End(xlUp).Row
     lastRowCopySource = wsCopySource.Cells(wsCopySource.Rows.Count, "C").End(xlUp).Row
 
     ' Loop through each row in the Input sheet from bottom to top
     For i = lastRowInput To 2 Step -1
+        ' Reset the insertion count for each 'sub' row
+        insertCount = 0
+
         ' Check if the "Flg" column (G) value is "sub"
         If LCase(wsInput.Cells(i, "G").Value) = "sub" Then
             ' Get the keyword from the Input sheet
             targetKeyword = Trim(wsInput.Cells(i, "C").Value)
 
-            ' Handle multiple keywords separated by commas
-            ' First, try splitting by Chinese comma
-            keywordParts = Split(targetKeyword, "，")
-            ' If that fails, try splitting by English comma
+            ' Replace the newline character (vbLf) with a comma before splitting
+            targetKeyword = Replace(targetKeyword, vbLf, ",")
+
+            ' Handle cases with multiple keywords, now including multi-line cells
+            keywordParts = Split(targetKeyword, "｣ｬ")
             If UBound(keywordParts) = 0 Then
                 keywordParts = Split(targetKeyword, ",")
             End If
 
-            pasteOffset = 0
-
-            ' Loop through each individual keyword
+            ' Loop through each individual keyword part
             For Each keywordPart In keywordParts
-                keywordPart = Trim(keywordPart)
+                Dim cleanedTarget As String
+                cleanedTarget = Replace(LCase(Trim(keywordPart)), " ", "")
 
-                ' Loop through each row in the CopySource sheet
+                ' Loop through the CopySource sheet to find matches
                 For j = 2 To lastRowCopySource
-                    sourceKeyword = Trim(wsCopySource.Cells(j, "C").Value)
+                    Dim cleanedSource As String
+                    cleanedSource = Replace(LCase(Trim(wsCopySource.Cells(j, "C").Value)), " ", "")
 
-                    ' Check if the keyword from CopySource matches the target keyword
-                    If LCase(sourceKeyword) = LCase(keywordPart) Then
-                        ' The paste row is the current row (i) plus the accumulated offset
-                        pasteRow = i + 1 + pasteOffset
+                    If cleanedSource = cleanedTarget Then
+                        ' Calculate the position for the new row insertion
+                        pasteRow = i + 1 + insertCount
 
-                        ' Insert a new row below the current row
+                        ' Insert a new row
                         wsInput.Rows(pasteRow).Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
-                        ' Copy the entire row from CopySource to the newly inserted row
+                        ' Copy the matching row
                         wsCopySource.Rows(j).Copy Destination:=wsInput.Rows(pasteRow)
-                        ' Apply yellow fill color to the pasted row
+                        ' Fill the new row with yellow color
                         wsInput.Rows(pasteRow).Interior.Color = RGB(255, 255, 0)
 
-                        ' Increment the paste offset for subsequent insertions at this spot
-                        pasteOffset = pasteOffset + 1
+                        ' Increment the insertion count
+                        insertCount = insertCount + 1
                     End If
                 Next j
             Next keywordPart
@@ -85,7 +82,7 @@ Sub CopyDataBasedOnKeyword()
 
     ' Clear the clipboard
     Application.CutCopyMode = False
-    ' Optional: Provide a message to the user that the script is complete
+    ' Inform the user that the script is complete
     MsgBox "Data transfer and insertion complete!", vbInformation, "Done"
 
 End Sub
