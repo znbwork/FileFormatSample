@@ -134,7 +134,7 @@ Sub ExtractValidationFlows()
                             fullText = Trim(GetRowText(wsSrc, scanRow, 1, maxCol))
                             If InStr(1, fullText, "[message].messageId", vbTextCompare) > 0 Then
                                 messageFound = True
-                                messageLine = full Text
+                                messageLine = fullText
                                 Exit Do
                             End If
 
